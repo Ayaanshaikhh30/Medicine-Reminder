@@ -20,7 +20,7 @@ const Signup = () => {
       return;
     }
   
-    console.log("Sending OTP to:", formData.email); // <-- Debug
+    console.log("Sending OTP to:", formData.otp); // <-- Debug
   
     setLoading(true);
     try {
@@ -44,6 +44,8 @@ const Signup = () => {
       setLoading(false);
       console.error("Send OTP Error:", error); // <-- Debug
       toast.error(" Server error. Please try again.");
+      console.log("OTP is:", formData.otp); 
+
     }
   };
   

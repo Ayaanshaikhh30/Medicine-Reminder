@@ -1,44 +1,61 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
-// 🔹 Email transporter setup
+// Debugging - verify env variables are loaded
+console.log("Email service starting with user:", process.env.EMAIL_USER);
+
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.EMAIL_USER, 
-    pass: process.env.EMAIL_PASS, 
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   },
+  tls: {
+    rejectUnauthorized: false // For local testing only
+  }
 });
 
-/**
- * ✅ Send OTP to user email with enhanced design
- * @param {string} email 
- * @param {string} otp 
- */
-const sendOTP = async (email, otp) => {
-  try {
-    const mailOptions = {
-      from: `"Your App Name" <${process.env.EMAIL_USER}>`, 
-      to: email,
-      subject: "🔑 Your OTP for Account Verification",
-      html: `
-      <div style="max-width: 500px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; border-radius: 10px; padding: 20px; background-color: #f9f9f9; text-align: center;">
-        <h2 style="color: #333;">🔒 OTP Verification</h2>
-        <p style="font-size: 16px; color: #555;">Use the following OTP to verify your account:</p>
-        <div style="font-size: 22px; font-weight: bold; color: #4CAF50; background: #fff; padding: 10px 20px; display: inline-block; border-radius: 5px; border: 2px dashed #4CAF50; margin: 10px 0;">
-          ${otp}
-        </div>
-        <p style="color: #666;">This OTP will expire in <strong>5 minutes</strong>. Do not share this with anyone.</p>
-        <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
-        <p style="font-size: 14px; color: #888;">If you did not request this OTP, please ignore this email.</p>
-      </div>
-      `,
-    };
+// Verify connection configuration
+transporter.verify(function(error, success) {
+  if (error) {
+    console.log("SMTP Connection Error:", error);
+  } else {
+    console.log("SMTP Server is ready to take our messages");
+  }
+});
 
-    await transporter.sendMail(mailOptions);
-    console.log(`✅ OTP sent to ${email}`);
+const sendOTP = async (email, otp) => {
+  console.log(`Preparing to send OTP ${otp} to ${email}`);
+
+  const mailOptions = {
+    from: `"MedReminder App" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Your Verification OTP",
+    text: `Your OTP code is: ${otp}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #2563eb;">MedReminder Verification</h2>
+        <p>Your one-time verification code is:</p>
+        <div style="font-size: 24px; font-weight: bold; color: #2563eb; margin: 20px 0;">${otp}</div>
+        <p>This code will expire in 10 minutes.</p>
+        <p style="font-size: 12px; color: #6b7280;">If you didn't request this code, please ignore this email.</p>
+      </div>
+    `
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent successfully!", info.response);
+    return true;
   } catch (error) {
-    console.error("❌ Error sending OTP:", error.message);
+    console.error("Email sending failed:", {
+      error: error.message,
+      stack: error.stack,
+      fullError: error
+    });
+    throw error;
   }
 };
 
