@@ -16,6 +16,7 @@ const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString()
 
 // ✅ Send OTP API
 router.post("/send-otp", async (req, res) => {
+  console.log("📥 /send-otp API hit");
   try {
     const { email } = req.body;
 
