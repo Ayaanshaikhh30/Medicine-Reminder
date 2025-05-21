@@ -50,7 +50,7 @@ function MedicationList({ addMedication }) {
         return;
       }
 
-      const response = await axios.get("https://medicine-reminder-backend.onrender.com/api/medications", {
+      const response = await axios.get("http://localhost:5000/api/medications", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -128,7 +128,7 @@ function MedicationList({ addMedication }) {
   
     try {
       const response = await axios.delete(
-        `https://medicine-reminder-backend.onrender.com/api/medications/${id}`,
+        `http://localhost:5000/api/medications/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`, 

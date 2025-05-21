@@ -69,7 +69,7 @@ function AddMedicationPage({addMedication }) {
   
     try {
       const response = await axios.post(
-        "https://medicine-reminder-backend.onrender.com/api/medications",
+        "http://localhost:5000/api/medications",
         {
           user_id: user._id,
           medication_name: medicationName,

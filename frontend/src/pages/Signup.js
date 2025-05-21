@@ -24,7 +24,7 @@ const Signup = () => {
   
     setLoading(true);
     try {
-      const response = await fetch("https://medicine-reminder-backend.onrender.com/api/auth/send-otp", {
+      const response = await fetch("http://localhost:5000/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email }),
@@ -50,43 +50,53 @@ const Signup = () => {
   };
   
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    if (!formData.otp) {
-      toast.error(" Please enter the OTP.");
-      return;
+ const handleSubmit = async (e) => {
+  console.log("Verifying OTP:", formData.otp, "for email:", formData.email);
+
+
+  e.preventDefault();
+
+  if (!otpSent) {
+    toast.error("Please send OTP first.");
+    return;
+  }
+
+  if (!formData.otp || !formData.name || !formData.password) {
+    toast.error("Please fill all fields and enter the OTP.");
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const response = await fetch("http://localhost:5000/api/auth/verify-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: formData.email,
+        name: formData.name,
+        otp: formData.otp.trim(),
+        password: formData.password,
+        
+
+      }),
+    });
+
+    const data = await response.json();
+    setLoading(false);
+   console.log("Verify OTP response:", data);
+
+    if (response.ok) {
+      toast.success("Congratulations, your account was created successfully.");
+      setTimeout(() => navigate("/login"), 1000);
+    } else {
+      toast.error(data.message || "Incorrect OTP or signup failed.");
     }
- 
-    
-    setLoading(true);
-    try {
-      const response = await fetch("https://medicine-reminder-backend.onrender.com/api/auth/verify-otp", {  // Correct API for OTP verification
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          name: formData.name,
-          otp: formData.otp,
-          password: formData.password, 
-        }),
-      });
-  
-      const data = await response.json();
-      setLoading(false);
-  
-      if (response.ok) {
-        toast.success(` Congratulations, Your account created successfully.`);
-        setTimeout(() => navigate("/login"), 1000);
-      } else {
-        toast.error(` ${data.message || "Incorrect OTP or Signup failed."}`);
-      }
-    } catch (error) {
-      setLoading(false);
-      toast.error(" Server error. Please try again.");
-    }
-  };
-  
+  } catch (error) {
+    setLoading(false);
+    toast.error("Server error. Please try again.");
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#EDF2F7] to-white dark:from-[#1A365D] dark:to-gray-900 flex items-center justify-center p-4">
