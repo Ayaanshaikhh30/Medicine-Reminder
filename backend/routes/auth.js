@@ -8,6 +8,7 @@ require("dotenv").config();
 
 // OTP Generator
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
+const otp = generateOTP(); // Only one OTP
 
 // ✅ Send OTP API
 router.post("/send-otp", async (req, res) => {

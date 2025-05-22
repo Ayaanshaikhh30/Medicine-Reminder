@@ -9,7 +9,7 @@ const medicationSchema = new mongoose.Schema({
     type: [String],
     required: true,
     validate: {
-      validator: (times) => times.every((time) => /^\d{2}:\d{2}$/.test(time)),
+      validator: (times) => times.every((time) => /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(time)),
       message: 'Invalid reminder time format. Use HH:mm (e.g., 08:00, 14:30).',
     },
   },
